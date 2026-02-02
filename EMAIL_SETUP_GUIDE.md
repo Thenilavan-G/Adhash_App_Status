@@ -5,6 +5,9 @@
 The workflow sends **automated email notifications** with the HTML report attached after each test run.
 
 **Email Configuration:**
+- **Email Provider:** Zoho Mail
+- **SMTP Server:** smtp.zoho.com
+- **Port:** 587 (TLS)
 - **From:** thenilavan@adhashtech.com
 - **To:** qateam@adhashtech.com
 - **Attachment:** Full HTML report with light red theme
@@ -35,7 +38,7 @@ Add these three secrets:
 
 #### Secret 2: EMAIL_PASSWORD
 - **Name:** `EMAIL_PASSWORD`
-- **Value:** `G8sYN8MRCWpM`
+- **Value:** Your Zoho email password (or App-specific password if 2FA is enabled)
 
 #### Secret 3: RECIPIENT_EMAIL
 - **Name:** `RECIPIENT_EMAIL`
@@ -104,15 +107,23 @@ The QA team will receive a professional HTML email with the report attached.
 1. **Check GitHub Secrets**: Verify all 3 secrets are added correctly
 2. **Check Workflow Logs**: Go to Actions → Click on run → Check "Send email" step
 3. **Check Spam Folder**: Email might be in spam/junk
-4. **Verify Credentials**: Ensure email and password are correct
+4. **Verify Zoho Credentials**:
+   - Ensure email is `thenilavan@adhashtech.com`
+   - Ensure password is correct for Zoho Mail
+   - If 2FA is enabled, use an App-specific password
+5. **Zoho SMTP Settings**:
+   - Server: `smtp.zoho.com`
+   - Port: `587`
+   - Security: TLS/STARTTLS
 
 ## ✅ Verification Checklist
 
 - [x] Repository created on GitHub
 - [x] Code pushed to GitHub
 - [x] SECRET: `SENDER_EMAIL` = `thenilavan@adhashtech.com`
-- [x] SECRET: `EMAIL_PASSWORD` = `G8sYN8MRCWpM`
+- [x] SECRET: `EMAIL_PASSWORD` = Your Zoho password
 - [x] SECRET: `RECIPIENT_EMAIL` = `qateam@adhashtech.com`
+- [x] Zoho SMTP configured: `smtp.zoho.com:587`
 - [ ] Workflow run manually (test)
 - [ ] Email received at qateam@adhashtech.com
 
