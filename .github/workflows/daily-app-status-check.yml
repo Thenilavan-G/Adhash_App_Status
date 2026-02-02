@@ -70,40 +70,12 @@ jobs:
           path: custom-reports/Unified_App_Verification_Report.html
           retention-days: 30
       
-      - name: Deploy report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./custom-reports
-          destination_dir: reports/${{ github.run_number }}
-          keep_files: true
-      
-      - name: Comment on commit with report link
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const runNumber = context.runNumber;
-            const repoUrl = context.payload.repository.html_url;
-            const reportUrl = `${repoUrl.replace('github.com', 'github.io').replace('https://', 'https://').split('/').slice(0, 4).join('/')}/reports/${runNumber}/Unified_App_Verification_Report.html`;
-
-            console.log(`Report available at: ${reportUrl}`);
-
-            // Create a summary
-            core.summary
-              .addHeading('📊 App Status Report Generated')
-              .addRaw(`Report #${runNumber} has been generated successfully!`)
-              .addLink('View Report', reportUrl)
-              .write();
-
       - name: Send email with HTML report
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          secure: true
           username: ${{ secrets.SENDER_EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
