@@ -1,170 +1,121 @@
-# Email Notification Setup Guide (GitHub Native)
+# Email Notification Setup Guide
 
 ## 📧 Overview
 
-The workflow uses **GitHub's native email notification system** to send reports. **No external SMTP configuration needed!**
+The workflow sends **automated email notifications** with the HTML report attached after each test run.
+
+**Email Configuration:**
+- **From:** thenilavan@adhashtech.com
+- **To:** qateam@adhashtech.com
+- **Attachment:** Full HTML report with light red theme
 
 ## ✅ How It Works
 
 1. **Workflow runs** at 3:00 PM IST daily
 2. **Tests execute** and generate HTML report
-3. **GitHub Issue created** with report summary and full HTML
-4. **GitHub sends email** to all watchers automatically
-5. **HTML report available** as downloadable artifact
+3. **Email sent** from `thenilavan@adhashtech.com` to `qateam@adhashtech.com`
+4. **HTML report attached** with light red theme and all app logos
+5. **Report also uploaded** to GitHub Actions artifacts
 
-## 🎯 Key Benefits
+## 🔧 Setup Instructions
 
-### ✅ **No SMTP Configuration Required**
-- ❌ No Gmail App Passwords needed
-- ❌ No email credentials to manage
-- ❌ No secrets to configure
-- ✅ **100% GitHub native solution**
+### Step 1: Add GitHub Secrets
 
-### ✅ **Secure & Reliable**
-- Emails sent from GitHub's servers (
-otifications@github.com)
-- No risk of email credentials being compromised
-- GitHub handles all email delivery
-- Professional and trusted sender
+You need to add **3 secrets** to your GitHub repository:
 
-### ✅ **Easy Management**
-- Add recipients by watching the repository
-- Remove recipients by unwatching
-- No code changes needed
-- Works with any email provider
+1. Go to your GitHub repository
+2. Click **Settings** → **Secrets and variables** → **Actions**
+3. Click **"New repository secret"**
 
-## 🔧 Setup Instructions (3 Simple Steps!)
+Add these three secrets:
 
-### Step 1: Watch the Repository
+#### Secret 1: EMAIL_FROM
+- **Name:** `EMAIL_FROM`
+- **Value:** `thenilavan@adhashtech.com`
 
-1. Go to your GitHub repository: https://github.com/YOUR_USERNAME/Adhash_App_Status
-2. Click the **"Watch"** button (top right corner)
-3. Select **"Custom"**
-4. Check **"Issues"** ✅
-5. Click **"Apply"**
+#### Secret 2: EMAIL_PASSWORD
+- **Name:** `EMAIL_PASSWORD`
+- **Value:** `G8sYN8MRCWpM`
 
-**That's it!** You'll now receive emails from GitHub for every report.
+#### Secret 3: EMAIL_TO
+- **Name:** `EMAIL_TO`
+- **Value:** `qateam@adhashtech.com`
 
-### Step 2: Verify Your Email Settings
+### Step 2: Verify Secrets
 
-1. Go to GitHub account settings: https://github.com/settings/notifications
-2. Ensure **"Email"** is enabled for:
-   - ✅ **Participating** - You're involved in the conversation
-   - ✅ **Watching** - Repositories you're watching
-3. Verify your email address is confirmed
-4. Check **"Include your own updates"** if you want to receive emails for your own actions
+After adding secrets, you should see in GitHub Settings → Secrets:
+- ✅ `EMAIL_FROM`
+- ✅ `EMAIL_PASSWORD`
+- ✅ `EMAIL_TO`
 
-### Step 3: (Optional) Add More Recipients
+### Step 3: Done!
 
-**Option A: Invite as Collaborators**
-1. Repository → Settings → Collaborators
-2. Click "Add people"
-3. Enter their GitHub username or email
-4. They accept invitation
-5. They click "Watch" → "Custom" → "Issues"
+That's it! The workflow will now send emails automatically.
 
-**Option B: Make Repository Public**
-1. Repository → Settings → Danger Zone
-2. Change visibility to Public
-3. Anyone can watch and receive notifications
-4. Share the repository URL with your team
+## 📧 Email Preview
 
-## 📧 What You'll Receive
+The QA team will receive a professional HTML email with the report attached.
 
-### Email from GitHub:
+**Email Details:**
+- **From:** thenilavan@adhashtech.com
+- **To:** qateam@adhashtech.com
+- **Subject:** 📊 Adhash App Status Report - [Run Number]
+- **Attachment:** Unified_App_Verification_Report.html
 
-`
-From: GitHub <notifications@github.com>
-Subject: [Adhash_App_Status] 📊 App Status Report #123 - 2026-02-02
+## 📎 What's Included
 
-📊 Adhash Application Status Report
+### Email Body:
+- ✅ Beautiful HTML formatted email
+- ✅ Report summary with date and run number
+- ✅ List of all verified apps
+- ✅ Link to GitHub Actions workflow run
+- ✅ Professional light red theme design
 
-Report Number: #123
-Date: 02/02/2026, 3:00:00 PM IST
+### Email Attachment:
+- ✅ Full HTML report: `Unified_App_Verification_Report.html`
+- ✅ Light red gradient theme
+- ✅ All 9 app logos embedded
+- ✅ Pass/Fail status for each app
+- ✅ Redirect URLs included
 
-📱 Apps Verified:
-✅ AutoChecker (Play Store)
-✅ WavedIn (Play Store & App Store)
-✅ Algomax (Play Store & App Store)
-✅ Auto eVantage (Play Store & App Store)
-✅ Spark me (Play Store & App Store)
+## 🧪 Testing
 
-📥 Download Report:
-• Download HTML Report Artifact
-• Full HTML report with all logos available
+### Test the Email Notification:
 
-🔗 Quick Links:
-• View Workflow Run
-• Download Artifacts
-
-Reply to this email directly or view it on GitHub
-`
-
-### Email Features:
-
-- ✅ **Subject**: Includes report number and date
-- ✅ **From**: GitHub official email (
-otifications@github.com)
-- ✅ **Body**: Report summary with all app statuses
-- ✅ **Links**: Direct links to download HTML report
-- ✅ **Full Report**: Embedded in GitHub issue (click to view)
-- ✅ **Artifact**: Downloadable HTML file with light red theme
-
-## 📥 How to Download the HTML Report
-
-### Method 1: From Email Link
-1. Open the email from GitHub
-2. Click "Download HTML Report Artifact"
-3. Download the zip file
-4. Extract and open Unified_App_Verification_Report.html
-
-### Method 2: From GitHub Issue
-1. Click the email link to view on GitHub
-2. Scroll to "Download Report" section
-3. Click the workflow run link
-4. Scroll to "Artifacts" section
-5. Download "html-report-XXX"
-
-### Method 3: From Actions Tab
-1. Go to repository → Actions tab
-2. Click on the latest workflow run
-3. Scroll to "Artifacts" section
-4. Download "html-report-XXX"
-
-## 🧪 Testing Email Notifications
-
-### Test: Manual Trigger
-1. Go to **Actions** tab
+1. Go to **Actions** tab in GitHub
 2. Click **"Daily App Status Check"**
 3. Click **"Run workflow"**
 4. Select branch: **main**
 5. Click **"Run workflow"**
 6. Wait 2-3 minutes
-7. **Check your email inbox!**
+7. **Check qateam@adhashtech.com inbox!**
+
+## 📊 Email Schedule
+
+| Event | Time | Email Sent To |
+|-------|------|---------------|
+| **Daily Schedule** | 3:00 PM IST | qateam@adhashtech.com |
+| **Manual Trigger** | Any time | qateam@adhashtech.com |
 
 ## 🔍 Troubleshooting
 
 ### Email not received?
 
-1. **Check Watching Settings**: Verify "Watch" → "Issues" is enabled
-2. **Check GitHub Notifications**: https://github.com/settings/notifications
-3. **Check Email**: Verify email is confirmed in GitHub settings
-4. **Check Spam**: Look in spam/junk folder
-5. **Check Issue Created**: Go to Issues tab - if issue exists, email was sent
+1. **Check GitHub Secrets**: Verify all 3 secrets are added correctly
+2. **Check Workflow Logs**: Go to Actions → Click on run → Check "Send email" step
+3. **Check Spam Folder**: Email might be in spam/junk
+4. **Verify Credentials**: Ensure email and password are correct
 
 ## ✅ Verification Checklist
 
 - [ ] Repository created on GitHub
 - [ ] Code pushed to GitHub
-- [ ] Clicked "Watch" button
-- [ ] Selected "Custom" → "Issues"
-- [ ] Email notifications enabled
+- [ ] SECRET: `EMAIL_FROM` = `thenilavan@adhashtech.com`
+- [ ] SECRET: `EMAIL_PASSWORD` = `G8sYN8MRCWpM`
+- [ ] SECRET: `EMAIL_TO` = `qateam@adhashtech.com`
 - [ ] Workflow run manually (test)
-- [ ] Email received from GitHub
-- [ ] HTML report downloaded
+- [ ] Email received at qateam@adhashtech.com
 
 ## 🎉 You're All Set!
 
-**The email is sent by GitHub, not from your code!** 🚀
-
-No SMTP credentials, no Gmail App Passwords, no secrets needed!
+The QA team will receive daily emails at 3:00 PM IST with the full HTML report attached!
