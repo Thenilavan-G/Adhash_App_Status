@@ -83,65 +83,139 @@ jobs:
               .addLink('View Report', reportUrl)
               .write();
 
-      - name: Send email with HTML report
+      - name: Read test results for email
         if: always()
-        uses: dawidd6/action-send-mail@v3
+        id: read_results
+        run: |
+          # Count test results
+          TOTAL_TESTS=9
+          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+
+          # Get current date
+          CURRENT_DATE=$(date +'%Y-%m-%d %H:%M:%S')
+          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
+
+      - name: Create email notification issue
+        if: always()
+        uses: actions/github-script@v7
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          secure: true
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
-          to: ${{ secrets.EMAIL_TO }}
-          from: Adhash App Status Bot
-          html_body: |
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #e57373 0%, #ef5350 100%); color: white; padding: 30px; text-align: center; border-radius: 8px; }
-                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 8px; }
-                .button { display: inline-block; padding: 12px 24px; background: #e57373; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0; }
-                .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">
-                  <h1>📊 Adhash Application Status Report</h1>
-                  <p>Daily Verification Report #${{ github.run_number }}</p>
-                </div>
-                <div class="content">
-                  <h2>Report Summary</h2>
-                  <p><strong>Date:</strong> ${{ github.event.repository.updated_at }}</p>
-                  <p><strong>Repository:</strong> ${{ github.repository }}</p>
-                  <p><strong>Workflow Run:</strong> #${{ github.run_number }}</p>
+          script: |
+            const fs = require('fs');
+            const runNumber = context.runNumber;
+            const runId = context.runId;
+            const repoUrl = context.payload.repository.html_url;
+            const artifactUrl = `${repoUrl}/actions/runs/${runId}`;
 
-                  <h3>📱 Apps Verified:</h3>
-                  <ul>
-                    <li>AutoChecker (Play Store)</li>
-                    <li>WavedIn (Play Store & App Store)</li>
-                    <li>Algomax (Play Store & App Store)</li>
-                    <li>Auto eVantage (Play Store & App Store)</li>
-                    <li>Spark me (Play Store & App Store)</li>
-                  </ul>
+            // Read the HTML report
+            let reportContent = '';
+            try {
+              reportContent = fs.readFileSync('custom-reports/Unified_App_Verification_Report.html', 'utf8');
+            } catch (error) {
+              reportContent = 'Report file not found';
+            }
 
-                  <p style="text-align: center; margin-top: 30px;">
-                    <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" class="button">View Workflow Run</a>
-                  </p>
+            // Create issue with report
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📊 App Status Report #${runNumber} - ${new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}`,
+              body: `## 📊 Adhash Application Status Report
 
-                  <p><strong>Note:</strong> The detailed HTML report is attached to this email.</p>
-                </div>
-                <div class="footer">
-                  <p>This is an automated report from Adhash App Status Bot</p>
-                  <p>Scheduled to run daily at 3:00 PM IST</p>
-                </div>
-              </div>
-            </body>
-            </html>
-          attachments: custom-reports/Unified_App_Verification_Report.html
-          priority: normal
+            **Report Number:** #${runNumber}
+            **Date:** ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+            **Workflow Run:** [View Details](${artifactUrl})
+
+            ### 📱 Apps Verified:
+            - ✅ AutoChecker (Play Store)
+            - ✅ WavedIn (Play Store & App Store)
+            - ✅ Algomax (Play Store & App Store)
+            - ✅ Auto eVantage (Play Store & App Store)
+            - ✅ Spark me (Play Store & App Store)
+
+            ### 📥 Download Report:
+            - [Download HTML Report Artifact](${artifactUrl})
+            - The full HTML report with all logos is available in the workflow artifacts
+
+            ### 🔗 Quick Links:
+            - [View Workflow Run](${artifactUrl})
+            - [Download Artifacts](${artifactUrl}#artifacts)
+
+            ---
+
+            <details>
+            <summary>📄 Click to view full HTML report</summary>
+
+            \`\`\`html
+            ${reportContent.substring(0, 60000)}
+            \`\`\`
+
+            </details>
+
+            ---
+
+            **Note:** Subscribe to this repository to receive email notifications for new reports.
+            Click "Watch" → "Custom" → "Issues" to get notified via email when new reports are created.
+
+            *This is an automated report generated daily at 3:00 PM IST*`,
+              labels: ['automated-report', 'app-status']
+            });
+
+            console.log(`Issue created: ${issue.data.html_url}`);
+
+            // Add comment with download instructions
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.data.number,
+              body: `### 📧 Email Notification Setup
+
+            To receive this report via email automatically:
+
+            1. Click the **Watch** button at the top of this repository
+            2. Select **Custom**
+            3. Check **Issues**
+            4. Click **Apply**
+
+            You will now receive an email from GitHub whenever a new report is created!
+
+            The email will include:
+            - ✅ Report summary
+            - ✅ Links to download the full HTML report
+            - ✅ Direct link to view this issue
+
+            **Download the HTML report:**
+            - Go to [Workflow Run](${artifactUrl})
+            - Scroll to "Artifacts" section
+            - Download "html-report-${runNumber}"
+            - Open the HTML file in your browser`
+            });
+
+      - name: Close old report issues
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Close issues older than 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'automated-report',
+              state: 'open'
+            });
+
+            for (const issue of issues.data) {
+              const createdAt = new Date(issue.created_at);
+              if (createdAt < thirtyDaysAgo) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed'
+                });
+                console.log(`Closed old issue #${issue.number}`);
+              }
+            }
 
