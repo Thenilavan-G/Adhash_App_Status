@@ -85,9 +85,9 @@ The QA team will receive a professional HTML email with the report attached.
 1. Go to **Actions** tab in GitHub
 2. Click **"Daily App Status Check"**
 3. Click **"Run workflow"**
-4. Select branch: **main**
+4. Select branch: **master**
 5. Click **"Run workflow"**
-6. Wait 2-3 minutes
+6. Wait 1-2 minutes (faster with caching!)
 7. **Check qateam@adhashtech.com inbox!**
 
 ## 📊 Email Schedule

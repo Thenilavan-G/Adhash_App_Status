@@ -40,10 +40,10 @@ git remote add origin git@github.com:YOUR_USERNAME/Adhash_App_Status.git
 
 ```bash
 # Set the default branch name
-git branch -M main
+git branch -M master
 
 # Push to GitHub
-git push -u origin main
+git push -u origin master
 ```
 
 ### Step 4: Enable GitHub Pages (for Report Hosting)
@@ -68,7 +68,7 @@ git push -u origin main
 1. Go to **Actions** tab
 2. Click **"Daily App Status Check"** workflow
 3. Click **"Run workflow"** button
-4. Select branch: **main**
+4. Select branch: **master**
 5. Click **"Run workflow"**
 
 ## 📊 Workflow Features
