@@ -29,24 +29,24 @@ You need to add **3 secrets** to your GitHub repository:
 
 Add these three secrets:
 
-#### Secret 1: EMAIL_FROM
-- **Name:** `EMAIL_FROM`
+#### Secret 1: SENDER_EMAIL
+- **Name:** `SENDER_EMAIL`
 - **Value:** `thenilavan@adhashtech.com`
 
 #### Secret 2: EMAIL_PASSWORD
 - **Name:** `EMAIL_PASSWORD`
 - **Value:** `G8sYN8MRCWpM`
 
-#### Secret 3: EMAIL_TO
-- **Name:** `EMAIL_TO`
+#### Secret 3: RECIPIENT_EMAIL
+- **Name:** `RECIPIENT_EMAIL`
 - **Value:** `qateam@adhashtech.com`
 
 ### Step 2: Verify Secrets
 
 After adding secrets, you should see in GitHub Settings → Secrets:
-- ✅ `EMAIL_FROM`
+- ✅ `SENDER_EMAIL`
 - ✅ `EMAIL_PASSWORD`
-- ✅ `EMAIL_TO`
+- ✅ `RECIPIENT_EMAIL`
 
 ### Step 3: Done!
 
@@ -108,11 +108,11 @@ The QA team will receive a professional HTML email with the report attached.
 
 ## ✅ Verification Checklist
 
-- [ ] Repository created on GitHub
-- [ ] Code pushed to GitHub
-- [ ] SECRET: `EMAIL_FROM` = `thenilavan@adhashtech.com`
-- [ ] SECRET: `EMAIL_PASSWORD` = `G8sYN8MRCWpM`
-- [ ] SECRET: `EMAIL_TO` = `qateam@adhashtech.com`
+- [x] Repository created on GitHub
+- [x] Code pushed to GitHub
+- [x] SECRET: `SENDER_EMAIL` = `thenilavan@adhashtech.com`
+- [x] SECRET: `EMAIL_PASSWORD` = `G8sYN8MRCWpM`
+- [x] SECRET: `RECIPIENT_EMAIL` = `qateam@adhashtech.com`
 - [ ] Workflow run manually (test)
 - [ ] Email received at qateam@adhashtech.com
 
