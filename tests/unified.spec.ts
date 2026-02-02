@@ -24,7 +24,7 @@ test.describe('Unified App Store Verification', () => {
 
   test('Verify all apps on both Play Store and App Store', async ({ page, context }) => {
     // Increase test timeout for multiple platforms
-    test.setTimeout(600000); // 10 minutes
+    test.setTimeout(300000); // 5 minutes (reduced from 10)
 
     console.log('\n🚀 Starting Unified App Verification Test\n');
     console.log('=' .repeat(80));
@@ -44,7 +44,7 @@ test.describe('Unified App Store Verification', () => {
         try {
           const tempAppStorePage = new AppStorePage(page);
           await page.goto(appData.appStore.directUrl);
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded'); // Faster than networkidle
           fetchedAppName = await tempAppStorePage.getAppName();
           if (fetchedAppName) {
             console.log(`   ✓ App name from App Store: ${fetchedAppName}`);
@@ -88,7 +88,7 @@ test.describe('Unified App Store Verification', () => {
         if (!isMatch) {
           console.log(`   ⚠ Search verification failed, trying direct URL...`);
           await page.goto(appData.playStore.directUrl);
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded'); // Faster than networkidle
 
           // Check if we're on the correct page
           const currentUrl = page.url();
@@ -153,7 +153,7 @@ test.describe('Unified App Store Verification', () => {
       }
 
       // Small delay between platforms
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(500); // Reduced from 2000ms
 
       // ========== APP STORE VERIFICATION ==========
       console.log('\n🍎 APP STORE VERIFICATION');
@@ -161,8 +161,7 @@ test.describe('Unified App Store Verification', () => {
       // Check if App Store is skipped for this app
       if (appData.appStore.skip) {
         console.log(`   ⏭️  Skipping App Store verification for ${appData.appName}`);
-        await page.waitForTimeout(1000);
-        continue;
+        continue; // No delay needed when skipping
       }
 
       const appStorePage = new AppStorePage(page);
@@ -197,7 +196,7 @@ test.describe('Unified App Store Verification', () => {
         if (!isMatch) {
           console.log(`   ⚠ Search verification failed, trying direct URL...`);
           await page.goto(appData.appStore.directUrl);
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded'); // Faster than networkidle
 
           // Check if we're on the correct page
           const currentUrl = page.url();
@@ -271,7 +270,7 @@ test.describe('Unified App Store Verification', () => {
       }
 
       // Small delay between apps
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(500); // Reduced from 2000ms
     }
 
     // Print final results summary

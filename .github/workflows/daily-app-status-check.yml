@@ -77,6 +77,7 @@ jobs:
           server_address: smtp.zoho.com
           server_port: 587
           secure: true
+          ignore_cert: true
           username: ${{ secrets.SENDER_EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: '📊 Adhash App Status Report - ${{ github.run_number }}'

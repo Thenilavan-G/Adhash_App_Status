@@ -7,7 +7,7 @@ export default defineConfig({
   testDir: './tests',
 
   /* Maximum time one test can run for - increased for logo downloads */
-  timeout: 600 * 1000, // 10 minutes
+  timeout: 300 * 1000, // 5 minutes (optimized)
   
   /* Run tests in files in parallel */
   fullyParallel: false,
@@ -43,10 +43,10 @@ export default defineConfig({
     video: 'retain-on-failure',
     
     /* Maximum time each action can take - increased for logo downloads */
-    actionTimeout: 60000, // 60 seconds
+    actionTimeout: 30000, // 30 seconds (optimized)
 
     /* Navigation timeout - increased for slower connections */
-    navigationTimeout: 60000, // 60 seconds
+    navigationTimeout: 30000, // 30 seconds (optimized)
   },
 
   /* Configure projects for major browsers */
