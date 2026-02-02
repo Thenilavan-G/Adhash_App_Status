@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple App Store App Verification Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .timestamp {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.blue {
+            border-top: 4px solid #3b82f6;
+        }
+
+        .stat-card.green {
+            border-top: 4px solid #10b981;
+        }
+
+        .stat-card.red {
+            border-top: 4px solid #ef4444;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-card.blue .stat-number {
+            color: #3b82f6;
+        }
+
+        .stat-card.green .stat-number {
+            color: #10b981;
+        }
+
+        .stat-card.red .stat-number {
+            color: #ef4444;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-rate {
+            text-align: center;
+            padding: 30px 40px 10px;
+        }
+
+        .success-percentage {
+            font-size: 64px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+
+        .success-label {
+            font-size: 16px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar-container {
+            margin: 20px 40px 40px;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 15px;
+            transition: width 1s ease;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 40px 0;
+        }
+
+        .results-table thead {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .results-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .results-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+        }
+
+        .results-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .results-table td {
+            padding: 16px;
+            font-size: 14px;
+        }
+
+        .results-table code {
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #1f2937;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .success-percentage {
+                font-size: 48px;
+            }
+
+            .results-table {
+                font-size: 12px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 10px;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-icon">🍎</div>
+            <h1>Apple App Store App Verification Report</h1>
+            <p class="timestamp">01/29/2026, 06:46:35</p>
+        </header>
+
+        <div class="stats-container">
+            <div class="stat-card blue">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon">✓</div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-icon">✗</div>
+                <div class="stat-number">1</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="success-rate">
+            <div class="success-percentage">75.0%</div>
+            <div class="success-label">Success Rate</div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 75.0%"></div>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>App Name</th>
+                    <th>Search Keyword</th>
+                    <th>Expected Package ID</th>
+                    <th>Actual Package ID</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td>1</td>
+                    <td><strong>WavedIn</strong></td>
+                    <td>wavedin</td>
+                    <td><code>https://apps.apple.com/in/app/wavedin/id6451483729</code></td>
+                    <td><code>undefined</code></td>
+                    <td><span class="status-badge status-pass">✓ OK</span></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><strong>AlgoMax</strong></td>
+                    <td>algomax</td>
+                    <td><code>https://apps.apple.com/in/app/algomax/id6498886667</code></td>
+                    <td><code>undefined</code></td>
+                    <td><span class="status-badge status-pass">✓ OK</span></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><strong>Auto Evantage</strong></td>
+                    <td>auto evantage</td>
+                    <td><code>https://apps.apple.com/in/app/auto-evantage/id6747385992</code></td>
+                    <td><code>undefined</code></td>
+                    <td><span class="status-badge status-pass">✓ OK</span></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><strong>Spark Me</strong></td>
+                    <td>spark me</td>
+                    <td><code>https://apps.apple.com/us/app/spark-me/id1578660405</code></td>
+                    <td><code>undefined</code></td>
+                    <td><span class="status-badge status-fail">✗ FAIL</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer>
+            <p>Generated by Playwright TypeScript Automation Framework</p>
+            <p>Powered by Page Object Model (POM) Architecture</p>
+        </footer>
+    </div>
+</body>
+</html>

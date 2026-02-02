@@ -1,0 +1,85 @@
+name: Daily App Status Check
+
+on:
+  # Schedule to run every day at 3:00 PM IST (9:30 AM UTC)
+  schedule:
+    - cron: '30 9 * * *'  # 3:00 PM IST = 9:30 AM UTC
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  test-app-availability:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run unified app verification tests
+        run: npx playwright test unified.spec.ts --reporter=list
+        continue-on-error: true
+      
+      - name: Generate HTML report
+        if: always()
+        run: |
+          npx tsc generate-report.ts --esModuleInterop --resolveJsonModule
+          node generate-report.js
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_number }}
+          path: |
+            test-results/
+            custom-reports/
+          retention-days: 30
+      
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-${{ github.run_number }}
+          path: custom-reports/Unified_App_Verification_Report.html
+          retention-days: 30
+      
+      - name: Deploy report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./custom-reports
+          destination_dir: reports/${{ github.run_number }}
+          keep_files: true
+      
+      - name: Comment on commit with report link
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runNumber = context.runNumber;
+            const repoUrl = context.payload.repository.html_url;
+            const reportUrl = `${repoUrl.replace('github.com', 'github.io').replace('https://', 'https://').split('/').slice(0, 4).join('/')}/reports/${runNumber}/Unified_App_Verification_Report.html`;
+            
+            console.log(`Report available at: ${reportUrl}`);
+            
+            // Create a summary
+            core.summary
+              .addHeading('📊 App Status Report Generated')
+              .addRaw(`Report #${runNumber} has been generated successfully!`)
+              .addLink('View Report', reportUrl)
+              .write();
+
