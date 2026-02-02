@@ -22,11 +22,25 @@ jobs:
           node-version: '20'
           cache: 'npm'
       
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies only
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       
       - name: Run unified app verification tests
         run: npx playwright test unified.spec.ts --reporter=list
@@ -90,11 +104,11 @@ jobs:
           server_address: smtp.gmail.com
           server_port: 587
           secure: true
-          username: ${{ secrets.EMAIL_FROM }}
+          username: ${{ secrets.SENDER_EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
-          to: ${{ secrets.EMAIL_TO }}
-          from: ${{ secrets.EMAIL_FROM }}
+          to: ${{ secrets.RECIPIENT_EMAIL }}
+          from: ${{ secrets.SENDER_EMAIL }}
           html_body: |
             <!DOCTYPE html>
             <html>
