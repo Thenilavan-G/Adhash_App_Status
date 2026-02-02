@@ -73,13 +73,75 @@ jobs:
             const runNumber = context.runNumber;
             const repoUrl = context.payload.repository.html_url;
             const reportUrl = `${repoUrl.replace('github.com', 'github.io').replace('https://', 'https://').split('/').slice(0, 4).join('/')}/reports/${runNumber}/Unified_App_Verification_Report.html`;
-            
+
             console.log(`Report available at: ${reportUrl}`);
-            
+
             // Create a summary
             core.summary
               .addHeading('📊 App Status Report Generated')
               .addRaw(`Report #${runNumber} has been generated successfully!`)
               .addLink('View Report', reportUrl)
               .write();
+
+      - name: Send email with HTML report
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
+          to: ${{ secrets.EMAIL_TO }}
+          from: Adhash App Status Bot
+          html_body: |
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #e57373 0%, #ef5350 100%); color: white; padding: 30px; text-align: center; border-radius: 8px; }
+                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 8px; }
+                .button { display: inline-block; padding: 12px 24px; background: #e57373; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+                .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>📊 Adhash Application Status Report</h1>
+                  <p>Daily Verification Report #${{ github.run_number }}</p>
+                </div>
+                <div class="content">
+                  <h2>Report Summary</h2>
+                  <p><strong>Date:</strong> ${{ github.event.repository.updated_at }}</p>
+                  <p><strong>Repository:</strong> ${{ github.repository }}</p>
+                  <p><strong>Workflow Run:</strong> #${{ github.run_number }}</p>
+
+                  <h3>📱 Apps Verified:</h3>
+                  <ul>
+                    <li>AutoChecker (Play Store)</li>
+                    <li>WavedIn (Play Store & App Store)</li>
+                    <li>Algomax (Play Store & App Store)</li>
+                    <li>Auto eVantage (Play Store & App Store)</li>
+                    <li>Spark me (Play Store & App Store)</li>
+                  </ul>
+
+                  <p style="text-align: center; margin-top: 30px;">
+                    <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" class="button">View Workflow Run</a>
+                  </p>
+
+                  <p><strong>Note:</strong> The detailed HTML report is attached to this email.</p>
+                </div>
+                <div class="footer">
+                  <p>This is an automated report from Adhash App Status Bot</p>
+                  <p>Scheduled to run daily at 3:00 PM IST</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          attachments: custom-reports/Unified_App_Verification_Report.html
+          priority: normal
 
