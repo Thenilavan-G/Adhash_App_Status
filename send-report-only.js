@@ -1,42 +1,10 @@
 require('dotenv').config();
-const { execSync } = require('child_process');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
-console.log('\n🚀 Starting Automated Test & Email Process\n');
-console.log('=' .repeat(80));
-
-// Step 1: Run Playwright tests
-console.log('\n📋 Step 1: Running Playwright tests...\n');
-try {
-  execSync('npx playwright test unified.spec.ts --reporter=list', {
-    stdio: 'inherit',
-    cwd: __dirname
-  });
-  console.log('\n✅ Tests completed successfully');
-} catch (error) {
-  console.log('\n⚠️  Tests completed with some failures (continuing to send report)');
-}
-
-// Step 2: Generate HTML report
-console.log('\n📊 Step 2: Generating HTML report...\n');
-try {
-  execSync('npx tsc generate-report.ts --esModuleInterop --resolveJsonModule', {
-    stdio: 'inherit',
-    cwd: __dirname
-  });
-  execSync('node generate-report.js', {
-    stdio: 'inherit',
-    cwd: __dirname
-  });
-  console.log('✅ Report generated');
-} catch (error) {
-  console.log('⚠️  Report generation completed');
-}
-
-// Step 3: Send email
-console.log('\n📧 Step 3: Sending email report...\n');
+console.log('\n📧 Sending Email Report...\n');
+console.log('='.repeat(80));
 
 async function sendEmail() {
   const senderEmail = process.env.SENDER_EMAIL;
@@ -45,25 +13,25 @@ async function sendEmail() {
   
   if (!senderEmail || !password || !recipientEmail) {
     console.error('❌ Error: Missing email credentials in .env file');
-    console.log('\nPlease update .env file with:');
-    console.log('SENDER_EMAIL=your_email@adhashtech.com');
-    console.log('EMAIL_PASSWORD=your_password');
-    console.log('RECIPIENT_EMAIL=recipient@adhashtech.com');
     process.exit(1);
   }
   
+  console.log(`\n📨 Email Configuration:`);
   console.log(`   From: ${senderEmail}`);
   console.log(`   To: ${recipientEmail}`);
+  console.log(`   SMTP: smtp.zoho.com:587\n`);
   
   // Read the HTML report
   const reportPath = path.join(__dirname, 'custom-reports', 'Unified_App_Verification_Report.html');
   
   if (!fs.existsSync(reportPath)) {
     console.error(`❌ Error: Report not found at ${reportPath}`);
+    console.log('\n💡 Run this first: node generate-report.js');
     process.exit(1);
   }
   
   const htmlContent = fs.readFileSync(reportPath, 'utf8');
+  console.log(`✅ Report loaded: ${reportPath}\n`);
   
   // Create transporter (Zoho)
   const transporter = nodemailer.createTransport({
@@ -79,9 +47,18 @@ async function sendEmail() {
     }
   });
   
+  console.log('🔌 Verifying SMTP connection...');
+  try {
+    await transporter.verify();
+    console.log('✅ SMTP connection verified\n');
+  } catch (error) {
+    console.error('❌ SMTP verification failed:', error.message);
+    process.exit(1);
+  }
+  
   // Email options
   const mailOptions = {
-    from: senderEmail,
+    from: `Adhash Automation <${senderEmail}>`,
     to: recipientEmail,
     subject: `📊 Adhash App Status Report - ${new Date().toLocaleDateString()}`,
     html: htmlContent,
@@ -93,20 +70,21 @@ async function sendEmail() {
     ]
   };
   
+  console.log('📤 Sending email...\n');
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('\n✅ Email sent successfully!');
+    console.log('✅ EMAIL SENT SUCCESSFULLY!');
     console.log(`   Message ID: ${info.messageId}`);
+    console.log(`   Response: ${info.response}`);
     console.log('\n' + '='.repeat(80));
-    console.log('🎉 Process completed successfully!');
-    console.log('=' .repeat(80) + '\n');
+    console.log('🎉 Email delivered successfully!');
+    console.log('='.repeat(80) + '\n');
   } catch (error) {
     console.error('\n❌ Error sending email:', error.message);
     console.log('\nTroubleshooting:');
     console.log('1. Check your email credentials in .env file');
-    console.log('2. Verify your Gmail password/app password is correct');
-    console.log('3. For Gmail, you MUST use an app-specific password');
-    console.log('4. Generate app password at: https://myaccount.google.com/apppasswords');
+    console.log('2. Verify your Zoho Mail password is correct');
+    console.log('3. Make sure you are using the app-specific password');
     process.exit(1);
   }
 }
