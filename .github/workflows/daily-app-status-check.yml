@@ -74,14 +74,16 @@ jobs:
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.sendgrid.net
+          server_address: smtp.zoho.com
           server_port: 587
           secure: false
-          username: apikey
-          password: ${{ secrets.SENDGRID_API_KEY }}
+          username: ${{ secrets.SENDER_EMAIL }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
           subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
           to: ${{ secrets.RECIPIENT_EMAIL }}
           from: ${{ secrets.SENDER_EMAIL }}
+          convert_markdown: false
+          ignore_cert: true
           html_body: |
             <!DOCTYPE html>
             <html>
