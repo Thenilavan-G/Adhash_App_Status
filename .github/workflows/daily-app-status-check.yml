@@ -74,9 +74,10 @@ jobs:
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
+          server_address: smtp.zoho.com
           server_port: 587
           secure: true
+          ignore_cert: true
           username: ${{ secrets.SENDER_EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: '📊 Adhash App Status Report - ${{ github.run_number }}'
