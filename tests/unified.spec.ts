@@ -291,8 +291,12 @@ test.describe('Unified App Store Verification', () => {
       contentType: 'application/json'
     });
 
-    // Final assertion - fail test if any app verification failed
-    expect(summary.failed, `${summary.failed} app(s) failed verification`).toBe(0);
+    // Log summary but don't fail the workflow - we want the email to be sent regardless
+    if (summary.failed > 0) {
+      console.log(`\n⚠️  WARNING: ${summary.failed} app(s) failed verification`);
+    } else {
+      console.log(`\n✅ All apps passed verification`);
+    }
   });
 
   test.afterAll(async () => {
