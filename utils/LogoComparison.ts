@@ -15,7 +15,12 @@ export class LogoComparison {
    */
   static async downloadLogo(page: Page, platform: 'playstore' | 'appstore', appName: string): Promise<string | null> {
     try {
+      // Wait for page to be fully loaded
+      await page.waitForLoadState('domcontentloaded', { timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(2000); // Give images time to load
+
       let logoElement;
+      let foundSelector = '';
 
       if (platform === 'playstore') {
         // Play Store logo selectors - try multiple options with increased timeout
@@ -30,16 +35,20 @@ export class LogoComparison {
           'img[alt*="icon"]',
           'img[alt*="logo"]',
           'header img',
-          'div[role="img"] img'
+          'div[role="img"] img',
+          'img[data-iml]' // Additional selector for Play Store
         ];
 
         for (const selector of selectors) {
           try {
-            logoElement = page.locator(selector).first();
-            await logoElement.waitFor({ state: 'visible', timeout: 10000 });
+            const element = page.locator(selector).first();
+            await element.waitFor({ state: 'attached', timeout: 5000 });
+
             // Verify the element has a valid src
-            const src = await logoElement.getAttribute('src');
-            if (src && src.length > 0) {
+            const src = await element.getAttribute('src');
+            if (src && src.length > 10 && !src.includes('data:image')) {
+              logoElement = element;
+              foundSelector = selector;
               console.log(`   ✓ Found logo using selector: ${selector}`);
               break;
             }
@@ -60,16 +69,20 @@ export class LogoComparison {
           'img[src*="is5-ssl"]',
           'picture source[type="image/png"] + img',
           'div[class*="artwork"] img',
-          'header img[src*="mzstatic"]'
+          'header img[src*="mzstatic"]',
+          'picture.product-hero__artwork img' // Additional selector
         ];
 
         for (const selector of selectors) {
           try {
-            logoElement = page.locator(selector).first();
-            await logoElement.waitFor({ state: 'visible', timeout: 10000 });
+            const element = page.locator(selector).first();
+            await element.waitFor({ state: 'attached', timeout: 5000 });
+
             // Verify the element has a valid src
-            const src = await logoElement.getAttribute('src');
-            if (src && src.length > 0) {
+            const src = await element.getAttribute('src');
+            if (src && src.length > 10 && !src.includes('data:image')) {
+              logoElement = element;
+              foundSelector = selector;
               console.log(`   ✓ Found logo using selector: ${selector}`);
               break;
             }
@@ -83,33 +96,61 @@ export class LogoComparison {
         console.log(`   ⚠ Could not find logo element for ${appName} on ${platform}`);
         return null;
       }
-      
+
       // Get the logo src
       const logoSrc = await logoElement.getAttribute('src');
       if (!logoSrc) {
         console.log(`   ⚠ Could not find logo src for ${appName} on ${platform}`);
         return null;
       }
-      
+
       // Create logos directory if it doesn't exist
       const logosDir = path.join(process.cwd(), 'test-results', 'logos');
       if (!fs.existsSync(logosDir)) {
         fs.mkdirSync(logosDir, { recursive: true });
       }
-      
+
       // Download the image
       const sanitizedAppName = appName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const logoPath = path.join(logosDir, `${sanitizedAppName}_${platform}.png`);
 
-      // Take screenshot of the logo element with increased timeout
-      await logoElement.screenshot({
-        path: logoPath,
-        timeout: 30000 // 30 seconds timeout for screenshot
-      });
+      // Try to take screenshot with retry logic
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          await logoElement.screenshot({
+            path: logoPath,
+            timeout: 20000 // 20 seconds timeout for screenshot
+          });
 
-      console.log(`   ✓ Logo saved: ${logoPath}`);
-      return logoPath;
-      
+          // Verify the file was created and has content
+          if (fs.existsSync(logoPath)) {
+            const stats = fs.statSync(logoPath);
+            if (stats.size > 100) { // At least 100 bytes
+              console.log(`   ✓ Logo saved: ${logoPath} (${stats.size} bytes)`);
+              return logoPath;
+            }
+          }
+
+          retries--;
+          if (retries > 0) {
+            console.log(`   ⚠ Logo file too small, retrying... (${retries} attempts left)`);
+            await page.waitForTimeout(1000);
+          }
+        } catch (screenshotError) {
+          retries--;
+          if (retries > 0) {
+            console.log(`   ⚠ Screenshot failed, retrying... (${retries} attempts left)`);
+            await page.waitForTimeout(1000);
+          } else {
+            throw screenshotError;
+          }
+        }
+      }
+
+      console.log(`   ⚠ Failed to capture valid logo after retries`);
+      return null;
+
     } catch (error) {
       console.log(`   ⚠ Failed to download logo for ${appName} on ${platform}: ${error}`);
       return null;
