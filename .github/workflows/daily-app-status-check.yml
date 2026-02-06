@@ -1,10 +1,10 @@
 name: Daily App Status Check
 
 on:
-  # Schedule to run every day at 3:00 PM IST (9:30 AM UTC)
-  schedule:
-    - cron: '30 9 * * *'  # 3:00 PM IST = 9:30 AM UTC
-  
+  # Schedule disabled - manual trigger only
+  # schedule:
+  #   - cron: '30 9 * * *'  # 3:00 PM IST = 9:30 AM UTC
+
   # Allow manual trigger
   workflow_dispatch:
 
